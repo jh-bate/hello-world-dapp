@@ -1,10 +1,24 @@
-FROM node:0.12.0
+FROM debian:stable
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+ENV DEBIAN_FRONTEND noninteractive
 
-COPY package.json /usr/src/app/
-RUN npm install
-COPY . /usr/src/app
+RUN apt-get update && apt-get upgrade -qy && apt-get install -qy \
+  curl \
+  ruby
 
-CMD [ "npm", "start" ]
+RUN gem install foreman
+
+RUN curl --location https://github.com/heroku/heroku-buildpack-nodejs/archive/master.tar.gz \
+ | tar --extract --gzip --directory=/opt
+
+RUN useradd --system --create-home node
+WORKDIR /home/node
+COPY . .
+
+RUN /opt/heroku-buildpack-nodejs-master/bin/detect .
+RUN /opt/heroku-buildpack-nodejs-master/bin/compile .
+
+RUN chown --recursive node: .
+USER node
+ENV PATH /home/node/.heroku/node/bin:$PATH
+CMD ["/usr/local/bin/foreman", "start"]

@@ -1,7 +1,7 @@
 {
   "name": "hello-world-dapp",
   "version": "1.0.0",
-  "description": "",
+  "description": "the Hello World dapp implemented in Node.js",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,5 +18,8 @@
   "homepage": "https://github.com/eris-ltd/hello-world-dapp",
   "dependencies": {
     "express": "^4.12.2"
+  },
+  "engines": {
+    "node": "0.10.x"
   }
 }
