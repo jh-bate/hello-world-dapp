@@ -1,1 +1,1 @@
-docker build --tag=eris/test .
+docker build --tag=eris/hello-world .
