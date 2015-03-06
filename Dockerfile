@@ -1,24 +1,30 @@
-FROM debian:stable
+FROM debian:wheezy
+MAINTAINER Eris Industries <support@ErisIndustries.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get upgrade -qy && apt-get install -qy \
   curl \
+  git \
   ruby
 
 RUN gem install foreman
 
-RUN curl --location https://github.com/heroku/heroku-buildpack-nodejs/archive/master.tar.gz \
- | tar --extract --gzip --directory=/opt
+RUN git clone https://github.com/cloudfoundry/nodejs-buildpack.git \
+  /opt/buildpack
+
+WORKDIR /opt/buildpack
+RUN git checkout v1.1.1
+RUN git submodule update --init --recursive
 
 RUN useradd --system --create-home node
 WORKDIR /home/node
 COPY . .
 
-RUN /opt/heroku-buildpack-nodejs-master/bin/detect .
-RUN /opt/heroku-buildpack-nodejs-master/bin/compile .
+RUN /opt/buildpack/bin/detect .
+RUN /opt/buildpack/bin/compile .
 
 RUN chown --recursive node: .
 USER node
-ENV PATH /home/node/.heroku/node/bin:$PATH
+ENV PATH /home/node/vendor/node/bin:$PATH
 CMD ["/usr/local/bin/foreman", "start"]
