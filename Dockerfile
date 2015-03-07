@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM golang:1.4
 MAINTAINER Eris Industries <support@ErisIndustries.com>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -10,6 +10,9 @@ RUN apt-get update && apt-get upgrade -qy && apt-get install -qy \
 
 RUN gem install foreman
 
+# Install Cloud Foundry Node.js buildpack
+# http://docs.cloudfoundry.org/buildpacks/node/index.html
+
 RUN git clone https://github.com/cloudfoundry/nodejs-buildpack.git \
   /opt/buildpack
 
@@ -17,14 +20,12 @@ WORKDIR /opt/buildpack
 RUN git checkout v1.1.1
 RUN git submodule update --init --recursive
 
-RUN useradd --system --create-home node
-WORKDIR /home/node
-COPY . .
+# Install IPFS (http://ipfs.io/docs/install/)
 
-RUN /opt/buildpack/bin/detect .
-RUN /opt/buildpack/bin/compile .
+RUN go get -u github.com/jbenet/go-ipfs/cmd/ipfs
+RUN ipfs init
 
-RUN chown --recursive node: .
-USER node
-ENV PATH /home/node/vendor/node/bin:$PATH
-CMD ["/usr/local/bin/foreman", "start"]
+RUN useradd --system node
+COPY cmd.sh /
+
+CMD ["/cmd.sh"]
