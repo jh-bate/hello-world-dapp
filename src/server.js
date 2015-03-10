@@ -1,11 +1,9 @@
 var express = require('express')
 var app = express()
 
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
+app.use(express.static('public'));
 
-var server = app.listen(process.env.VCAP_APP_PORT || 3000, function () {
+var server = app.listen(process.env.VCAP_APP_PORT, function () {
 
   var host = server.address().address
   var port = server.address().port
