@@ -1,1 +1,1 @@
-docker build --tag=eris/hello-world .
+docker build --tag=eris/decerver2 .
